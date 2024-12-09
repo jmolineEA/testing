@@ -21,11 +21,6 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
 
-      - name: Set up Git
-        run: |
-          git config user.name "${ github.actor }@users.noreply.github.com"
-          git config user.email "${ github.actor }"
-
       - name: Get the default branch name
         id: get_default_branch
         run: |
