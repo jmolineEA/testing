@@ -1,0 +1,39 @@
+name: Reset branch to Default (Develop)
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to reset'
+        required: true
+        default: 'uat'
+        type: choice
+        options:
+          - 'uat'
+
+jobs:
+  reset-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Set up Git
+        run: |
+          git config user.name "${ github.actor }@users.noreply.github.com"
+          git config user.email "${ github.actor }"
+
+      - name: Get the default branch name
+        id: get_default_branch
+        run: |
+          echo "DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | awk '{print $3}')" >> $GITHUB_ENV
+
+      - name: Reset branch to default
+        run: |
+          git fetch origin
+          git checkout ${{ inputs.branch }}
+          git reset --hard origin/${{ env.DEFAULT_BRANCH }}
+          git push origin ${{ inputs.branch }} --force
